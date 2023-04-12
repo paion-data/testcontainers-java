@@ -1,0 +1,34 @@
+# Copyright (c) Jiaqi Liu.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+---
+name: Documentation Release
+
+'on':
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  release-documentation:
+    name: Deploy Documentation to GitHub Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Required mkdocs Plugins
+        run: |
+          pip3 install mkdocs
+          pip3 install mkdocs-material
+          pip3 install mkdocs-codeinclude-plugin
+          pip3 install mkdocs-markdownextradata-plugin
+      - name: Deploy Documentation
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONFIG_FILE: mkdocs.yml

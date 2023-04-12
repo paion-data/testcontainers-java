@@ -30,3 +30,26 @@ please describe the new functionality and why you believe it's useful. If your p
 request relates to any existing issues, please reference them by using the issue number
 prefixed with #.
 -->
+
+Changelog
+---------
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+Checklist
+---------
+
+* [ ] Test
+* [ ] Self-review
+* [ ] Documentation
+* 

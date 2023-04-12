@@ -10,7 +10,7 @@ repository:
   description: Testcontainers is a Java library that supports JUnit tests, providing lightweight, throwaway instances of common databases, Selenium web browsers, or anything else that can run in a Docker container.
 
   # A URL with more information about the repository
-  homepage: https://testcontainers.org
+  homepage: https://QubitPi.github.io/testcontainers-java
 
   # A comma-separated list of topics to set on the repository
   topics: java,testing,docker,docker-compose,jvm,test-automation,junit,hacktoberfest,integration-testing
