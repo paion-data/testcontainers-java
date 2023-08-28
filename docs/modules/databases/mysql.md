@@ -38,3 +38,30 @@ Add the following dependency to your `pom.xml`/`build.gradle` file:
 
 !!! hint
     Adding this Testcontainers library JAR will not automatically add a database driver JAR to your project. You should ensure that your project also has a suitable database driver as a dependency.
+
+## Start Using MySQL Container in Integration Test
+
+```groovy
+import org.testcontainers.containers.MySQLContainer
+import org.testcontainers.spock.Testcontainers
+
+import spock.lang.Shared
+import spock.lang.Specification
+
+@Testcontainers
+class MyITSpec extends Specification {
+
+    @Shared
+    final MySQLContainer MYSQL = new MySQLContainer("mysql:5.7.43").withDatabaseName("testDbName")
+
+    def setupSpec() {
+        System.setProperty(
+                "DB_URL",
+                String.format("jdbc:mysql://localhost:%s/elide?serverTimezone=UTC", MYSQL.firstMappedPort)
+        )
+    }
+}
+```
+
+!!! hint
+    If _withDatabaseName_ is invoked, DB container will create a database as well in the container. This is very useful for IT tests that requires a pre-configured DB to be ready 

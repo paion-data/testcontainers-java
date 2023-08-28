@@ -52,4 +52,3 @@ Checklist
 * [ ] Test
 * [ ] Self-review
 * [ ] Documentation
-* 

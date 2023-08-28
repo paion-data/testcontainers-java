@@ -64,7 +64,7 @@ jobs:
       - uses: ./.github/actions/setup-junit-report
 
   turbo-mode:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: github.repository == 'testcontainers/testcontainers-java'
     runs-on: ubuntu-22.04
     permissions:
       checks: write
