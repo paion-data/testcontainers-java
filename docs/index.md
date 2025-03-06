@@ -1,3 +1,7 @@
+!!! warning "Disclaimer"
+    This is NOT the official Testcontainers documentation. This site is used for personal study only. The official
+    _Testcontainers for Java_ is at [java.testcontainers.org](https://java.testcontainers.org/)
+
 # Testcontainers for Java
 
 <p align=center><strong>Not using Java? Here are other supported languages!</strong></p>
