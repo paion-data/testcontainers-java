@@ -1,0 +1,2842 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://java.testcontainers.org/modules/databases/jdbc/">
+      
+      <link rel="icon" href="../../../favicon.ico">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.1.3">
+    
+    
+      
+        <title>JDBC support - Testcontainers for Java</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.edf004c2.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/extra.css">
+    
+      <link rel="stylesheet" href="../../../css/tc-header.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e44a95720257486eab94698a6b4c6ca6"}'></script><!-- End Cloudflare Web Analytics -->
+
+    
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<script rel="text/javascript" src="/js/tc-header.js" defer></script>
+
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="testcontainers" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#jdbc-support" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      <!--
+  Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to
+  deal in the Software without restriction, including without limitation the
+  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+-->
+
+<!-- Determine base classes -->
+
+
+  
+
+
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: none">
+    <symbol id="icon-external" viewBox="0 0 15 17" width="15" height="17" fill="currentColor">
+        <path  d="M9.334 1.254a.999.999 0 1 0 0 2h1.584l-5.29 5.293a1.002 1.002 0 0 0 1.415 1.416l5.29-5.294v1.585a.999.999 0 1 0 2 0v-4c0-.553-.446-1-1-1h-4Zm-6.5 1a2.5 2.5 0 0 0-2.5 2.5v8a2.5 2.5 0 0 0 2.5 2.5h8a2.5 2.5 0 0 0 2.5-2.5v-2.5a.999.999 0 1 0-2 0v2.5c0 .275-.226.5-.5.5h-8a.501.501 0 0 1-.5-.5v-8c0-.275.224-.5.5-.5h2.5a.999.999 0 1 0 0-2h-2.5Z" />
+    </symbol>
+    <symbol id="icon-caret" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+        <path d="M.487 2.157a1.662 1.662 0 0 1 2.357 0L5 4.313l2.156-2.156a1.657 1.657 0 0 1 2.354 0 1.657 1.657 0 0 1 0 2.354L6.177 7.847a1.66 1.66 0 0 1-1.815.36 1.658 1.658 0 0 1-.54-.361L.487 4.51a1.66 1.66 0 0 1 .001-2.353Z" />
+    </symbol>
+    <symbol id="icon-slack" class="icon-slack" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
+        <path d="M8.76.06a2.392 2.392 0 0 0-2.207 3.309A2.392 2.392 0 0 0 8.76 4.847h2.39V2.453A2.392 2.392 0 0 0 8.76.06Zm0 6.384H2.39A2.392 2.392 0 0 0 .18 9.753a2.392 2.392 0 0 0 2.208 1.479h6.372a2.391 2.391 0 0 0 2.208-3.31 2.39 2.39 0 0 0-2.208-1.478ZM23.893 8.837a2.392 2.392 0 0 0-3.304-2.21 2.392 2.392 0 0 0-1.474 2.21v2.395h2.39a2.391 2.391 0 0 0 2.388-2.395Zm-6.371 0V2.453a2.39 2.39 0 1 0-4.779 0v6.384a2.39 2.39 0 1 0 4.779 0ZM15.133 24a2.391 2.391 0 0 0 2.389-2.394 2.39 2.39 0 0 0-2.39-2.394h-2.389v2.394A2.39 2.39 0 0 0 15.133 24Zm0-6.384h6.371a2.39 2.39 0 0 0 2.39-2.394 2.392 2.392 0 0 0-2.39-2.394h-6.372a2.391 2.391 0 0 0-2.389 2.394 2.39 2.39 0 0 0 2.39 2.394ZM0 15.222a2.391 2.391 0 0 0 4.08 1.691 2.391 2.391 0 0 0 .699-1.691v-2.394h-2.39A2.392 2.392 0 0 0 0 15.222m6.372 0v6.384a2.391 2.391 0 0 0 3.304 2.211 2.39 2.39 0 0 0 1.474-2.211v-6.384a2.392 2.392 0 0 0-2.39-2.394 2.391 2.391 0 0 0-2.388 2.394" />
+    </symbol>
+    <symbol id="icon-github" class="icon-github" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12Z" />
+    </symbol>
+</svg>
+<header id="site-header">
+    <div class="brand">
+        <a href="https://testcontainers.com/" class="logo">
+            <img src="/testcontainers-logo.svg" alt="Testcontainers" width="183" height="48"/>
+        </a>
+        <button id="mobile-menu-toggle">
+            Menu
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <rect y="22" width="30" height="4" rx="2"/>
+                <rect y="13" width="30" height="4" rx="2"/>
+                <rect y="4" width="30" height="4" rx="2"/>
+            </svg>
+        </button>
+    </div>
+    <nav>
+        <ul class="menu">
+            
+                
+                    <li class="menu-item">
+                        <a href="https://testcontainers.com/desktop/">
+                            
+                            Desktop <span class="badge rounded-pill">NEW</span>
+                        </a>
+                    </li>
+                
+            
+                
+                    <li class="menu-item">
+                        <a href="https://testcontainers.com/cloud/">
+                            
+                            Cloud
+                        </a>
+                    </li>
+                
+            
+                
+                    <li class="menu-item">
+                        <a href="https://testcontainers.com/getting-started/">
+                            
+                            Getting Started
+                        </a>
+                    </li>
+                
+            
+                
+                    <li class="menu-item">
+                        <a href="https://testcontainers.com/guides/">
+                            
+                            Guides
+                        </a>
+                    </li>
+                
+            
+                
+                    <li class="menu-item">
+                        <a href="https://testcontainers.com/modules/">
+                            
+                            Modules
+                        </a>
+                    </li>
+                
+            
+                
+                    <li class="menu-item has-children">
+                        <button>
+                            Docs
+                            <svg class="icon-caret" width="10" height="10" viewBox="0 0 10 10">
+                                <use href="#icon-caret"></use>
+                            </svg>
+                        </button>
+                        <ul class="menu-dropdown">
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://java.testcontainers.org/" >
+                                        
+                                            <img src="/language-logos/java.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for Java
+                                        
+                                    </a>
+                                </li>
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://golang.testcontainers.org/" >
+                                        
+                                            <img src="/language-logos/go.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for Go
+                                        
+                                    </a>
+                                </li>
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://dotnet.testcontainers.org/" >
+                                        
+                                            <img src="/language-logos/dotnet.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for .NET
+                                        
+                                    </a>
+                                </li>
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://node.testcontainers.org/" >
+                                        
+                                            <img src="/language-logos/nodejs.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for Node.js
+                                        
+                                    </a>
+                                </li>
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://testcontainers-python.readthedocs.io/en/latest/" target="_blank">
+                                        
+                                            <img src="/language-logos/python.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for Python
+                                        
+                                            <svg class="icon-external" width="15" height="17" viewBox="0 0 15 17" aria-hidden="true" focusable="false">
+                                                <use href="#icon-external"></use>
+                                            </svg>
+                                        
+                                    </a>
+                                </li>
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://docs.rs/testcontainers/latest/testcontainers/" target="_blank">
+                                        
+                                            <img src="/language-logos/rust.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for Rust
+                                        
+                                            <svg class="icon-external" width="15" height="17" viewBox="0 0 15 17" aria-hidden="true" focusable="false">
+                                                <use href="#icon-external"></use>
+                                            </svg>
+                                        
+                                    </a>
+                                </li>
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://github.com/testcontainers/testcontainers-hs" target="_blank">
+                                        
+                                            <img src="/language-logos/haskell.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for Haskell
+                                        
+                                            <svg class="icon-external" width="15" height="17" viewBox="0 0 15 17" aria-hidden="true" focusable="false">
+                                                <use href="#icon-external"></use>
+                                            </svg>
+                                        
+                                    </a>
+                                </li>
+                            
+                                <li class="menu-dropdown-item">
+                                    <a href="https://github.com/testcontainers/testcontainers-ruby" target="_blank">
+                                        
+                                            <img src="/language-logos/ruby.svg" alt="" width="24" height="24"/>
+                                        
+                                        Testcontainers for Ruby
+                                        
+                                            <svg class="icon-external" width="15" height="17" viewBox="0 0 15 17" aria-hidden="true" focusable="false">
+                                                <use href="#icon-external"></use>
+                                            </svg>
+                                        
+                                    </a>
+                                </li>
+                            
+                        </ul>
+                    </li>
+                
+            
+                
+                    <li class="menu-item">
+                        <a href="https://slack.testcontainers.org/">
+                            
+                                <svg class="icon-slack" width="24" height="24" viewBox="0 0 24 24">
+                                    <use href="#icon-slack"></use>
+                                </svg>
+                            
+                            Slack
+                        </a>
+                    </li>
+                
+            
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/testcontainers">
+                            
+                                <svg class="icon-github" width="24" height="24" viewBox="0 0 24 24">
+                                    <use href="#icon-github"></use>
+                                </svg>
+                            
+                            GitHub
+                        </a>
+                    </li>
+                
+            
+        </ul>
+    </nav>
+</header>
+
+<!-- Header -->
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav
+    class="md-header__inner md-grid"
+    aria-label=""
+  >
+  
+    <!-- Button to open drawer -->
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+
+    <!-- Header title -->
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+            <a href="../../..">
+                <span class="md-ellipsis">
+                    Testcontainers for Java
+                </span>
+            </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color palette -->
+    
+      
+    
+
+    <!-- Site language selector -->
+    
+
+    <!-- Button to open search modal -->
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+
+      <!-- Search interface -->
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    <!-- Repository information -->
+    
+      <div class="md-header__source">
+        <a href="https://github.com/QubitPi/testcontainers-java" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    testcontainers-java
+  </div>
+</a>
+      </div>
+    
+  </nav>
+
+  <!-- Navigation tabs (sticky) -->
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <!--
+  Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to
+  deal in the Software without restriction, including without limitation the
+  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+-->
+
+<!-- Determine class according to configuration -->
+
+
+
+
+<!-- Main navigation -->
+<nav class="md-nav md-nav--primary" aria-label="" data-md-level="0">
+
+    <!-- Site title -->
+    <label class="md-nav__title" for="__drawer">
+        Content
+    </label>
+
+    <!-- Repository information -->
+    
+    <div class="md-nav__source">
+        <a href="https://github.com/QubitPi/testcontainers-java" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    testcontainers-java
+  </div>
+</a>
+    </div>
+    
+
+    <!-- Render item list -->
+    <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        
+        
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Quickstart
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Quickstart" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Quickstart
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../quickstart/junit_4_quickstart/" class="md-nav__link">
+        JUnit 4 Quickstart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../quickstart/junit_5_quickstart/" class="md-nav__link">
+        JUnit 5 Quickstart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../quickstart/spock_quickstart/" class="md-nav__link">
+        Spock Quickstart
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Features
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Features" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Features
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/creating_container/" class="md-nav__link">
+        Creating a container
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/networking/" class="md-nav__link">
+        Networking and communicating with containers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/commands/" class="md-nav__link">
+        Executing commands
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/files/" class="md-nav__link">
+        Files and volumes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/startup_and_waits/" class="md-nav__link">
+        Waiting for containers to start or be ready
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/container_logs/" class="md-nav__link">
+        Accessing container logs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/creating_images/" class="md-nav__link">
+        Creating images on-the-fly
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/jib/" class="md-nav__link">
+        Using Jib
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/configuration/" class="md-nav__link">
+        Custom configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/image_name_substitution/" class="md-nav__link">
+        Image name substitution
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/advanced_options/" class="md-nav__link">
+        Advanced options
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../features/reuse/" class="md-nav__link">
+        Reusable Containers (Experimental)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Modules
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Modules" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Modules
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_1" type="checkbox" id="__nav_4_1" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4_1">
+          Databases
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Databases" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_1">
+          <span class="md-nav__icon md-icon"></span>
+          Databases
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        Database containers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          JDBC support
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        JDBC support
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#database-containers-launched-via-jdbc-url-scheme" class="md-nav__link">
+    Database containers launched via JDBC URL scheme
+  </a>
+  
+    <nav class="md-nav" aria-label="Database containers launched via JDBC URL scheme">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbc-url-examples" class="md-nav__link">
+    JDBC URL examples
+  </a>
+  
+    <nav class="md-nav" aria-label="JDBC URL examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-clickhouse" class="md-nav__link">
+    Using ClickHouse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-cockroachdb" class="md-nav__link">
+    Using CockroachDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-cratedb" class="md-nav__link">
+    Using CrateDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-db2" class="md-nav__link">
+    Using DB2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-mariadb" class="md-nav__link">
+    Using MariaDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-mysql" class="md-nav__link">
+    Using MySQL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-mssql-server" class="md-nav__link">
+    Using MSSQL Server
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-oceanbase" class="md-nav__link">
+    Using OceanBase
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-oracle" class="md-nav__link">
+    Using Oracle
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-postgis" class="md-nav__link">
+    Using PostGIS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-postgresql" class="md-nav__link">
+    Using PostgreSQL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-questdb" class="md-nav__link">
+    Using QuestDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-timescaledb" class="md-nav__link">
+    Using TimescaleDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-pgvector" class="md-nav__link">
+    Using PGVector
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-tidb" class="md-nav__link">
+    Using TiDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-timeplus" class="md-nav__link">
+    Using Timeplus
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-trino" class="md-nav__link">
+    Using Trino
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-yugabytedb" class="md-nav__link">
+    Using YugabyteDB
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-a-classpath-init-script" class="md-nav__link">
+    Using a classpath init script
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-an-init-script-from-a-file" class="md-nav__link">
+    Using an init script from a file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-an-init-function" class="md-nav__link">
+    Using an init function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-container-in-daemon-mode" class="md-nav__link">
+    Running container in daemon mode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-container-with-tmpfs-options" class="md-nav__link">
+    Running container with tmpfs options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-container-objects" class="md-nav__link">
+    Database container objects
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../r2dbc/" class="md-nav__link">
+        R2DBC support
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cassandra/" class="md-nav__link">
+        Cassandra Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cockroachdb/" class="md-nav__link">
+        CockroachDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../couchbase/" class="md-nav__link">
+        Couchbase Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clickhouse/" class="md-nav__link">
+        Clickhouse Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cratedb/" class="md-nav__link">
+        CrateDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../databend/" class="md-nav__link">
+        Databend Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../db2/" class="md-nav__link">
+        DB2 Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dynalite/" class="md-nav__link">
+        Dynalite Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../influxdb/" class="md-nav__link">
+        InfluxDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mariadb/" class="md-nav__link">
+        MariaDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mongodb/" class="md-nav__link">
+        MongoDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mssqlserver/" class="md-nav__link">
+        MS SQL Server Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mysql/" class="md-nav__link">
+        MySQL Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neo4j/" class="md-nav__link">
+        Neo4j Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oceanbase/" class="md-nav__link">
+        OceanBase Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oraclefree/" class="md-nav__link">
+        Oracle Database Free Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oraclexe/" class="md-nav__link">
+        Oracle-XE Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../orientdb/" class="md-nav__link">
+        OrientDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../postgres/" class="md-nav__link">
+        Postgres Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presto/" class="md-nav__link">
+        Presto Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../questdb/" class="md-nav__link">
+        QuestDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scylladb/" class="md-nav__link">
+        ScyllaDB
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tidb/" class="md-nav__link">
+        TiDB Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../timeplus/" class="md-nav__link">
+        Timeplus Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trino/" class="md-nav__link">
+        Trino Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yugabytedb/" class="md-nav__link">
+        YugabyteDB Module
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../activemq/" class="md-nav__link">
+        ActiveMQ
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../azure/" class="md-nav__link">
+        Azure Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chromadb/" class="md-nav__link">
+        ChromaDB
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../consul/" class="md-nav__link">
+        Hashicorp Consul Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docker_compose/" class="md-nav__link">
+        Docker Compose Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../elasticsearch/" class="md-nav__link">
+        Elasticsearch container
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gcloud/" class="md-nav__link">
+        GCloud Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../grafana/" class="md-nav__link">
+        Grafana
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hivemq/" class="md-nav__link">
+        HiveMQ Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../k3s/" class="md-nav__link">
+        K3s Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../k6/" class="md-nav__link">
+        k6 Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kafka/" class="md-nav__link">
+        Kafka Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ldap/" class="md-nav__link">
+        LDAP
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../localstack/" class="md-nav__link">
+        LocalStack Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../milvus/" class="md-nav__link">
+        Milvus
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../minio/" class="md-nav__link">
+        MinIO Containers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mockserver/" class="md-nav__link">
+        Mockserver Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nginx/" class="md-nav__link">
+        Nginx Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ollama/" class="md-nav__link">
+        Ollama
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../openfga/" class="md-nav__link">
+        OpenFGA
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pinecone/" class="md-nav__link">
+        Pinecone
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pulsar/" class="md-nav__link">
+        Apache Pulsar Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../qdrant/" class="md-nav__link">
+        Qdrant
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rabbitmq/" class="md-nav__link">
+        RabbitMQ Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../redpanda/" class="md-nav__link">
+        Redpanda
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solace/" class="md-nav__link">
+        Solace Container
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solr/" class="md-nav__link">
+        Solr Container
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../toxiproxy/" class="md-nav__link">
+        Toxiproxy Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../typesense/" class="md-nav__link">
+        Typesense
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vault/" class="md-nav__link">
+        Hashicorp Vault Module
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaviate/" class="md-nav__link">
+        Weaviate
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../webdriver_containers/" class="md-nav__link">
+        Webdriver Containers
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Test framework integration
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Test framework integration" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Test framework integration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../test_framework_integration/junit_4/" class="md-nav__link">
+        JUnit 4
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../test_framework_integration/junit_5/" class="md-nav__link">
+        Jupiter / JUnit 5
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../test_framework_integration/spock/" class="md-nav__link">
+        Spock
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../test_framework_integration/manual_lifecycle_control/" class="md-nav__link">
+        Manual container lifecycle control
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../test_framework_integration/external/" class="md-nav__link">
+        External Integrations
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/" class="md-nav__link">
+        Examples
+      </a>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          System Requirements
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="System Requirements" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          System Requirements
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/" class="md-nav__link">
+        General Container runtime requirements
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../error_missing_container_runtime_environment/" class="md-nav__link">
+        Fixing Issues with Discovering A Supported Container Runtime Environment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7_3" type="checkbox" id="__nav_7_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7_3">
+          Continuous Integration
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Continuous Integration" data-md-level="2">
+        <label class="md-nav__title" for="__nav_7_3">
+          <span class="md-nav__icon md-icon"></span>
+          Continuous Integration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/aws_codebuild/" class="md-nav__link">
+        AWS CodeBuild
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/dind_patterns/" class="md-nav__link">
+        Patterns for running tests inside a Docker container
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/circle_ci/" class="md-nav__link">
+        CircleCI (Cloud, Server v2.x, and Server v3.x)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/concourse_ci/" class="md-nav__link">
+        Concourse CI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/drone/" class="md-nav__link">
+        Drone CI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/gitlab_ci/" class="md-nav__link">
+        GitLab CI
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/bitbucket_pipelines/" class="md-nav__link">
+        Bitbucket Pipelines
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/tekton/" class="md-nav__link">
+        Tekton
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/continuous_integration/travis/" class="md-nav__link">
+        Travis
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/windows/" class="md-nav__link">
+        Windows Support
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/logging_config/" class="md-nav__link">
+        Recommended logback configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../supported_docker_environment/image_registry_rate_limiting/" class="md-nav__link">
+        Image Registry rate limiting
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../getting_help/" class="md-nav__link">
+        Getting help
+      </a>
+    </li>
+  
+
+        
+        
+        
+        
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Contributing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Contributing" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Contributing
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing_docs/" class="md-nav__link">
+        Contributing to documentation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../bounty/" class="md-nav__link">
+        Testcontainers issue bounty policy
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+        
+        <li class="community-callout-wrapper">
+            <div class="community-callout">
+                <h2>Join the community</h2>
+                <ul>
+                    <li>
+                        <a href="https://slack.testcontainers.org/" target="_blank">
+                            <img src="/icons/slack.svg" alt="Slack" width="30" height="31">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/testcontainers" target="_blank">
+                            <img src="/icons/github.svg" alt="GitHub" width="30" height="31">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://stackoverflow.com/questions/tagged/testcontainers" target="_blank">
+                            <img src="/icons/stackoverflow.svg" alt="StackOverflow" width="26" height="31">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://twitter.com/testcontainers" target="_blank">
+                            <img src="/icons/twitter.svg" alt="Twitter" width="37" height="31">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#database-containers-launched-via-jdbc-url-scheme" class="md-nav__link">
+    Database containers launched via JDBC URL scheme
+  </a>
+  
+    <nav class="md-nav" aria-label="Database containers launched via JDBC URL scheme">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbc-url-examples" class="md-nav__link">
+    JDBC URL examples
+  </a>
+  
+    <nav class="md-nav" aria-label="JDBC URL examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-clickhouse" class="md-nav__link">
+    Using ClickHouse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-cockroachdb" class="md-nav__link">
+    Using CockroachDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-cratedb" class="md-nav__link">
+    Using CrateDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-db2" class="md-nav__link">
+    Using DB2
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-mariadb" class="md-nav__link">
+    Using MariaDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-mysql" class="md-nav__link">
+    Using MySQL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-mssql-server" class="md-nav__link">
+    Using MSSQL Server
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-oceanbase" class="md-nav__link">
+    Using OceanBase
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-oracle" class="md-nav__link">
+    Using Oracle
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-postgis" class="md-nav__link">
+    Using PostGIS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-postgresql" class="md-nav__link">
+    Using PostgreSQL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-questdb" class="md-nav__link">
+    Using QuestDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-timescaledb" class="md-nav__link">
+    Using TimescaleDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-pgvector" class="md-nav__link">
+    Using PGVector
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-tidb" class="md-nav__link">
+    Using TiDB
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-timeplus" class="md-nav__link">
+    Using Timeplus
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-trino" class="md-nav__link">
+    Using Trino
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-yugabytedb" class="md-nav__link">
+    Using YugabyteDB
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-a-classpath-init-script" class="md-nav__link">
+    Using a classpath init script
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-an-init-script-from-a-file" class="md-nav__link">
+    Using an init script from a file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-an-init-function" class="md-nav__link">
+    Using an init function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-container-in-daemon-mode" class="md-nav__link">
+    Running container in daemon mode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-container-with-tmpfs-options" class="md-nav__link">
+    Running container with tmpfs options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-container-objects" class="md-nav__link">
+    Database container objects
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/QubitPi/testcontainers-java/edit/main/docs/modules/databases/jdbc.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+<h1 id="jdbc-support">JDBC support</h1>
+<p>You can obtain a temporary database in one of two ways:</p>
+<ul>
+<li><strong>Using a specially modified JDBC URL</strong>: after making a very simple modification to your system's JDBC URL string, Testcontainers will provide a disposable stand-in database that can be used without requiring modification to your application code.</li>
+<li><strong>JUnit @Rule/@ClassRule</strong>: this mode starts a database inside a container before your tests and tears it down afterwards.</li>
+</ul>
+<h2 id="database-containers-launched-via-jdbc-url-scheme">Database containers launched via JDBC URL scheme</h2>
+<p>As long as you have Testcontainers and the appropriate JDBC driver on your classpath, you can simply modify regular JDBC connection URLs to get a fresh containerized instance of the database each time your application starts up.</p>
+<p><em>N.B:</em></p>
+<ul>
+<li><em>TC needs to be on your application's classpath at runtime for this to work</em></li>
+<li><em>For Spring Boot (Before version <code>2.3.0</code>) you need to specify the driver manually <code>spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver</code></em></li>
+</ul>
+<p><strong>Original URL</strong>: <code>jdbc:mysql://localhost:3306/databasename</code></p>
+<p>Insert <code>tc:</code> after <code>jdbc:</code> as follows. Note that the hostname, port and database name will be ignored; you can leave these as-is or set them to any value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We will use <code>///</code> (host-less URIs) from now on to emphasis the unimportance of the <code>host:port</code> pair.<br />
+From Testcontainers' perspective, <code>jdbc:mysql:8.0.36://localhost:3306/databasename</code> and <code>jdbc:mysql:8.0.36:///databasename</code> is the same URI.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you're using the JDBC URL support, there is no need to instantiate an instance of the container - Testcontainers will do it automagically.</p>
+</div>
+<h3 id="jdbc-url-examples">JDBC URL examples</h3>
+<h4 id="using-clickhouse">Using ClickHouse</h4>
+<p><code>jdbc:tc:clickhouse:18.10.3:///databasename</code></p>
+<h4 id="using-cockroachdb">Using CockroachDB</h4>
+<p><code>jdbc:tc:cockroach:v21.2.3:///databasename</code></p>
+<h4 id="using-cratedb">Using CrateDB</h4>
+<p><code>jdbc:tc:cratedb:5.2.3//localhost:5432/crate</code></p>
+<h4 id="using-db2">Using DB2</h4>
+<p><code>jdbc:tc:db2:11.5.0.0a//localhost:5432/crate</code></p>
+<h4 id="using-mariadb">Using MariaDB</h4>
+<p><code>jdbc:tc:mariadb:10.3.39:///databasename</code></p>
+<h4 id="using-mysql">Using MySQL</h4>
+<p><code>jdbc:tc:mysql:8.0.36:///databasename</code></p>
+<h4 id="using-mssql-server">Using MSSQL Server</h4>
+<p><code>jdbc:tc:sqlserver:2017-CU12:///databasename</code></p>
+<h4 id="using-oceanbase">Using OceanBase</h4>
+<p><code>jdbc:tc:oceanbasece:4.2.1-lts:///databasename</code></p>
+<h4 id="using-oracle">Using Oracle</h4>
+<p><code>jdbc:tc:oracle:21-slim-faststart:///databasename</code></p>
+<h4 id="using-postgis">Using PostGIS</h4>
+<p><code>jdbc:tc:postgis:9.6-2.5:///databasename</code></p>
+<h4 id="using-postgresql">Using PostgreSQL</h4>
+<p><code>jdbc:tc:postgresql:9.6.8:///databasename</code></p>
+<h4 id="using-questdb">Using QuestDB</h4>
+<p><code>jdbc:tc:questdb:6.5.3:///databasename</code></p>
+<h4 id="using-timescaledb">Using TimescaleDB</h4>
+<p><code>jdbc:tc:timescaledb:2.1.0-pg13:///databasename</code></p>
+<h4 id="using-pgvector">Using PGVector</h4>
+<p><code>jdbc:tc:pgvector:pg16:///databasename</code></p>
+<h4 id="using-tidb">Using TiDB</h4>
+<p><code>jdbc:tc:tidb:v6.1.0:///databasename</code></p>
+<h4 id="using-timeplus">Using Timeplus</h4>
+<p><code>jdbc:tc:timeplus:2.3.21:///databasename</code></p>
+<h4 id="using-trino">Using Trino</h4>
+<p><code>jdbc:tc:trino:352://localhost/memory/default</code></p>
+<h4 id="using-yugabytedb">Using YugabyteDB</h4>
+<p><code>jdbc:tc:yugabyte:2.14.4.0-b26:///databasename</code></p>
+<h3 id="using-a-classpath-init-script">Using a classpath init script</h3>
+<p>Testcontainers can run an init script after the database container is started, but before your code is given a connection to it. The script must be on the classpath, and is referenced as follows:</p>
+<p><code>jdbc:tc:mysql:8.0.36:///databasename?TC_INITSCRIPT=somepath/init_mysql.sql</code></p>
+<p>This is useful if you have a fixed script for setting up database schema, etc.</p>
+<h3 id="using-an-init-script-from-a-file">Using an init script from a file</h3>
+<p>If the init script path is prefixed <code>file:</code>, it will be loaded from a file (relative to the working directory, which will usually be the project root).</p>
+<p><code>jdbc:tc:mysql:8.0.36:///databasename?TC_INITSCRIPT=file:src/main/resources/init_mysql.sql</code></p>
+<h3 id="using-an-init-function">Using an init function</h3>
+<p>Instead of running a fixed script for DB setup, it may be useful to call a Java function that you define. This is intended to allow you to trigger database schema migration tools. To do this, add TC_INITFUNCTION to the URL as follows, passing a full path to the class name and method:</p>
+<p><code>jdbc:tc:mysql:8.0.36:///databasename?TC_INITFUNCTION=org.testcontainers.jdbc.JDBCDriverTest::sampleInitFunction</code></p>
+<p>The init function must be a public static method which takes a <code>java.sql.Connection</code> as its only parameter, e.g.
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">JDBCDriverTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sampleInitFunction</span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">connection</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// e.g. run schema setup or Flyway/liquibase/etc DB migrations here...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="p">...</span>
+</code></pre></div></p>
+<h3 id="running-container-in-daemon-mode">Running container in daemon mode</h3>
+<p>By default database container is being stopped as soon as last connection is closed. There are cases when you might need to start container and keep it running till you stop it explicitly or JVM is shutdown. To do this, add <code>TC_DAEMON</code> parameter to the URL as follows:</p>
+<p><code>jdbc:tc:mysql:8.0.36:///databasename?TC_DAEMON=true</code></p>
+<p>With this parameter database container will keep running even when there's no open connections.</p>
+<h3 id="running-container-with-tmpfs-options">Running container with tmpfs options</h3>
+<p>Container can have <code>tmpfs</code> mounts for storing data in host memory. This is useful if you want to speed up your database tests. Be aware that the data will be lost when the container stops.</p>
+<p>To pass this option to the container, add <code>TC_TMPFS</code> parameter to the URL as follows:</p>
+<p><code>jdbc:tc:postgresql:9.6.8:///databasename?TC_TMPFS=/testtmpfs:rw</code></p>
+<p>If you need more than one option, separate them by comma (e.g. <code>TC_TMPFS=key:value,key1:value1&amp;other_parameters=foo</code>).</p>
+<p>For more information about <code>tmpfs</code> mount, see <a href="https://docs.docker.com/storage/tmpfs/">the official Docker documentation</a>.</p>
+<h2 id="database-container-objects">Database container objects</h2>
+<p>In case you can't use the URL support, or need to fine-tune the container, you can instantiate it yourself.</p>
+<p>Add a @Rule or @ClassRule to your test class, e.g.:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SimpleMySQLTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Rule</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">MySQLContainer</span><span class="w"> </span><span class="n">mysql</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MySQLContainer</span><span class="p">();</span>
+</code></pre></div>
+<p>Now, in your test code (or a suitable setup method), you can obtain details necessary to connect to this database:</p>
+<ul>
+<li><code>mysql.getJdbcUrl()</code> provides a JDBC URL your code can connect to</li>
+<li><code>mysql.getUsername()</code> provides the username your code should pass to the driver</li>
+<li><code>mysql.getPassword()</code> provides the password your code should pass to the driver</li>
+</ul>
+<p>Note that if you use <code>@Rule</code>, you will be given an isolated container for each test method. If you use <code>@ClassRule</code>, you will get on isolated container for all the methods in the test class.</p>
+<p>Examples/Tests:</p>
+<ul>
+<li><a href="https://github.com/testcontainers/testcontainers-java/blob/main/modules/mysql/src/test/java/org/testcontainers/junit/mysql/SimpleMySQLTest.java">MySQL</a></li>
+<li><a href="https://github.com/testcontainers/testcontainers-java/blob/main/modules/postgresql/src/test/java/org/testcontainers/junit/postgresql/SimplePostgreSQLTest.java">PostgreSQL</a></li>
+</ul>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Database containers" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Database containers
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../r2dbc/" class="md-footer__link md-footer__link--next" aria-label="Next: R2DBC support" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              R2DBC support
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.0bbba5b5.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.e1a181d9.min.js"></script>
+      
+    
+  </body>
+</html>
